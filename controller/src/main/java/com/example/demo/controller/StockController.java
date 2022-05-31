@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping(path = "/stock")
 @RequiredArgsConstructor
@@ -23,7 +25,7 @@ public class StockController {
     }
 
     @PatchMapping
-    public void update(@RequestHeader Integer version, @RequestBody StockDetail stockDetail){
+    public void update(@RequestHeader Integer version,@Valid @RequestBody StockDetail stockDetail){
         try {
             stockFacade.get(version).update(stockDetail);
         } catch (InvalidStockRequestException ex) {
