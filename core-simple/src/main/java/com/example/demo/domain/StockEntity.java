@@ -34,7 +34,25 @@ public class StockEntity {
     public enum Color {
         BLACK,
         BLUE,
-        ;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        StockEntity that = (StockEntity) o;
+
+        if (!name.equals(that.name)) return false;
+        if (!size.equals(that.size)) return false;
+        return color == that.color;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name.hashCode();
+        result = 31 * result + size.hashCode();
+        result = 31 * result + color.hashCode();
+        return result;
+    }
 }
