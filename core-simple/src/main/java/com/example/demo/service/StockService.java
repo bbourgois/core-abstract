@@ -62,18 +62,32 @@ public class StockService extends AbstractStockCore {
     public void update(StockDetail stockDetail) {
         Integer quantity = stockDetail.getQuantity();
         if (quantity > 0) {
-            checkMaxCapacity(quantity);
-
-
-            StockEntity toSave = new StockEntity();
-            toSave.setName(stockDetail.getName());
-            toSave.setSize(stockDetail.getSize());
-            toSave.setColor(StockEntity.Color.valueOf(stockDetail.getColor().toString()));
-            toSave.setQuantity(quantity);
-            stockRepository.save(toSave);
-
+            addInStock(stockDetail, quantity);
         }
 
+    }
+
+    private void addInStock(StockDetail stockDetail, Integer quantity) {
+        checkMaxCapacity(quantity);
+
+        StockEntity toUpdate = checkAlreadyInStock(stockDetail);
+        if (toUpdate != null) {
+            toUpdate.setQuantity(toUpdate.getQuantity() + quantity);
+            stockRepository.save(toUpdate);
+        } else {
+            StockEntity toInsert = new StockEntity();
+            toInsert.setName(stockDetail.getName());
+            toInsert.setSize(stockDetail.getSize());
+            toInsert.setColor(StockEntity.Color.valueOf(stockDetail.getColor().toString()));
+            toInsert.setQuantity(quantity);
+            stockRepository.save(toInsert);
+        }
+    }
+
+    private StockEntity checkAlreadyInStock(StockDetail stockDetail) {
+        List<StockEntity> alreadyInStock = stockRepository.findByNameAndSizeAndColor(stockDetail.getName(), stockDetail.getSize(),
+                StockEntity.Color.valueOf(stockDetail.getColor().toString()));
+        return alreadyInStock.size() > 0 ? alreadyInStock.get(0) : null;
     }
 
     private void checkMaxCapacity(Integer quantity) {

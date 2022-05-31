@@ -112,6 +112,33 @@ public class StockControllerIntegrationTest {
 
     }
 
+    @Test
+    public void whenPatchStock_add_many_time_the_same_shoes_box_should_work()
+            throws Exception {
+        StockDetail stockDetail = mockHikingShoesWithQuantity(10);
+        mvc.perform(patch("/stock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", VERSION_1)
+                .content(objectMapper.writeValueAsString(stockDetail))
+        ).andExpect(status().isOk());
+
+        StockDetail otherStockDetail = mockHikingShoesWithQuantity(15);
+        mvc.perform(patch("/stock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", VERSION_1)
+                .content(objectMapper.writeValueAsString(otherStockDetail))
+        ).andExpect(status().isOk());
+
+        mvc.perform(get("/stock")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("version", VERSION_1))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("state", is("SOME")))
+                .andExpect(jsonPath("$.shoes[0].quantity", is(25)));
+    }
+
+
     private StockDetail mockHikingShoesWithQuantity(int quantity) {
         return mockStockDetailBuilder(quantity)
                 .name("hiking shoes")
