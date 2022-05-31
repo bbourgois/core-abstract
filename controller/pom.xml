@@ -24,12 +24,7 @@
     </dependency>
     <dependency>
       <groupId>com.example</groupId>
-      <artifactId>core-legacy</artifactId>
-      <version>${parent.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.example</groupId>
-      <artifactId>core-new</artifactId>
+      <artifactId>core-simple</artifactId>
       <version>${parent.version}</version>
     </dependency>
   </dependencies>
