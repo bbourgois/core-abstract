@@ -19,7 +19,7 @@
 
 # Stock 
 
-Manage the stock of a shop with a max capacity of 30 box shoes.
+Manage the stock of a shop with a max capacity of 30 shoe boxes.
 
 Only version 1 is available.
 
@@ -69,6 +69,8 @@ answer when there are some boxes:
 ```shell script
 curl  -X PATCH "localhost:8080/stock" -H "version:1" --data '{"size":42, "color":"BLACK", "name":"hiking shoes",  "quantity":3}'  -H "content-type: application/json"
 ```
+
+Available colors are only BLUE and BLACK
 
 
 # Explanations
