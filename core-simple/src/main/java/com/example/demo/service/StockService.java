@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Implementation(version = 2)
+@Implementation(version = 1)
 public class StockService extends AbstractStockCore  {
 
     public static final int MAX_CAPACITY = 30;

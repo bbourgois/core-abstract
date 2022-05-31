@@ -17,6 +17,60 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+# Stock 
+
+Manage the stock of a shop with a max capacity of 30 box shoes.
+
+Only version 1 is available.
+
+## Swagger
+
+```shell script
+http://localhost:8080/swagger-ui/index.html
+```
+
+
+## Stock API
+
+### get the stock 
+
+Return the state of the stock (EMPTY, FULL or SOME)
+
+```shell script
+curl  "localhost:8080/stock" -H "version:1"
+```
+
+answer when stock is empty:
+
+```json
+{
+  "state": "EMPTY",
+  "shoes": []
+}
+```
+
+answer when there are some boxes:
+
+```json
+{
+  "state": "SOME",
+  "shoes": [
+    {
+      "size": 42,
+      "name": "hiking shoes",
+      "color": "BLACK",
+      "quantity": 3
+    }
+  ]
+}
+```
+### update the stock
+
+```shell script
+curl  -X PATCH "localhost:8080/stock" -H "version:1" --data '{"size":42, "color":"BLACK", "name":"hiking shoes",  "quantity":3}'  -H "content-type: application/json"
+```
+
+
 # Explanations
 
 ## Notes
