@@ -1,7 +1,10 @@
 package com.example.demo.service;
 
 
+import com.example.demo.domain.InvalidStockRequestException;
 import com.example.demo.domain.StockEntity;
+import com.example.demo.dto.in.ShoeFilter;
+import com.example.demo.dto.in.StockDetail;
 import com.example.demo.dto.out.State;
 import com.example.demo.dto.out.Stock;
 import com.example.demo.repository.StockRepository;
@@ -61,6 +64,17 @@ public class StockServiceTest {
         assertThat(res.getShoes().size()).isEqualTo(stock.size());
     }
 
+    @Test(expected = InvalidStockRequestException.class)
+    public void update_should_send_exception_when_max_capacity_check_failed() {
+        StockDetail stockDetail = StockDetail.builder()
+                .quantity(31)
+                .size(BigInteger.valueOf(39l))
+                .name("shoes test")
+                .color(ShoeFilter.Color.BLUE)
+                .build();
+        Mockito.when(stockRepository.getStockCapacity()).thenReturn(null);
+        stockService.update(stockDetail);
+    }
 
     private StockEntity mockStockEntityHikingShoesWithQuantity(int quantity) {
         StockEntity blueShoes = new StockEntity();
