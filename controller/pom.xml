@@ -24,7 +24,7 @@
     </dependency>
     <dependency>
       <groupId>com.example</groupId>
-      <artifactId>new_core</artifactId>
+      <artifactId>core-simple</artifactId>
       <version>${parent.version}</version>
     </dependency>
   </dependencies>

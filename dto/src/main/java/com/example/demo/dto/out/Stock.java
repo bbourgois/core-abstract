@@ -1,16 +1,16 @@
 package com.example.demo.dto.out;
 
+import com.example.demo.dto.in.StockDetail;
 import lombok.Builder;
 import lombok.Value;
 
-import java.util.Map;
+import java.util.List;
 
 @Value
 @Builder
 public class Stock {
 
-    private State state;
-
-    Map<Shoe, Integer> stock;
+    State state;
+    List<StockDetail> shoes;
 
 }

@@ -11,7 +11,7 @@
     <module>core</module>
     <module>core-legacy</module>
     <module>core-new</module>
-    <module>new_core</module>
+    <module>core-simple</module>
   </modules>
 
   <parent>
