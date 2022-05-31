@@ -60,17 +60,47 @@ public class StockService extends AbstractStockCore {
     @Override
     @Transactional
     public void update(StockDetail stockDetail) {
-        Integer quantity = stockDetail.getQuantity();
-        if (quantity > 0) {
-            addInStock(stockDetail, quantity);
+        if (stockDetail.getQuantity() > 0) {
+            addInStock(stockDetail);
+        } else {
+            removeFromStock(stockDetail);
         }
 
     }
 
-    private void addInStock(StockDetail stockDetail, Integer quantity) {
+    private void removeFromStock(StockDetail stockDetail) {
+        StockEntity toUpdate = checkIfShoeBoxIsInStock(stockDetail);
+        Integer newQuantity = checkQuantityInStock(stockDetail, toUpdate);
+
+        if (newQuantity == 0) {
+            stockRepository.delete(toUpdate);
+        } else {
+            toUpdate.setQuantity(newQuantity);
+            stockRepository.save(toUpdate);
+        }
+    }
+
+    private Integer checkQuantityInStock(StockDetail stockDetail, StockEntity toUpdate) {
+        int newQuantity = toUpdate.getQuantity() + stockDetail.getQuantity();
+        if (newQuantity < 0) {
+            throw new InvalidStockRequestException("There are not enough shoes in stock");
+        }
+        return newQuantity;
+    }
+
+    private StockEntity checkIfShoeBoxIsInStock(StockDetail stockDetail) {
+        StockEntity stockEntity = findInStock(stockDetail);
+        if (stockEntity == null) {
+            throw new InvalidStockRequestException("Shoes are not in stock");
+        }
+        return stockEntity;
+    }
+
+    private void addInStock(StockDetail stockDetail) {
+        Integer quantity = stockDetail.getQuantity();
         checkMaxCapacity(quantity);
 
-        StockEntity toUpdate = checkAlreadyInStock(stockDetail);
+        StockEntity toUpdate = findInStock(stockDetail);
         if (toUpdate != null) {
             toUpdate.setQuantity(toUpdate.getQuantity() + quantity);
             stockRepository.save(toUpdate);
@@ -84,7 +114,7 @@ public class StockService extends AbstractStockCore {
         }
     }
 
-    private StockEntity checkAlreadyInStock(StockDetail stockDetail) {
+    private StockEntity findInStock(StockDetail stockDetail) {
         List<StockEntity> alreadyInStock = stockRepository.findByNameAndSizeAndColor(stockDetail.getName(), stockDetail.getSize(),
                 StockEntity.Color.valueOf(stockDetail.getColor().toString()));
         return alreadyInStock.size() > 0 ? alreadyInStock.get(0) : null;
@@ -92,7 +122,7 @@ public class StockService extends AbstractStockCore {
 
     private void checkMaxCapacity(Integer quantity) {
         Integer stockCapacity = stockRepository.getStockCapacity();
-        Integer newStockCapacity = stockCapacity == null ? quantity : stockCapacity + quantity;
+        int newStockCapacity = stockCapacity == null ? quantity : stockCapacity + quantity;
 
         if (newStockCapacity > MAX_CAPACITY) {
             throw new InvalidStockRequestException("Max capacity");

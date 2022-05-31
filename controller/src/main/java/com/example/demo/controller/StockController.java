@@ -28,7 +28,7 @@ public class StockController {
             stockFacade.get(version).update(stockDetail);
         } catch (InvalidStockRequestException ex) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+                    HttpStatus.BAD_REQUEST, ex.getMessage());
         }
     }
 
