@@ -1,11 +1,14 @@
 package com.example.demo.controller;
 
+import com.example.demo.domain.InvalidStockRequestException;
 import com.example.demo.dto.in.StockDetail;
 import com.example.demo.dto.out.Stock;
 import com.example.demo.facade.StockFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping(path = "/stock")
@@ -21,7 +24,12 @@ public class StockController {
 
     @PatchMapping
     public void update(@RequestHeader Integer version, @RequestBody StockDetail stockDetail){
-        stockFacade.get(version).update(stockDetail);
+        try {
+            stockFacade.get(version).update(stockDetail);
+        } catch (InvalidStockRequestException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, ex.getMessage(), ex);
+        }
     }
 
 }

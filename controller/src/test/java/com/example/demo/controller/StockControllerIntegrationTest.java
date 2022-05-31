@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class StockControllerIntegrationTest {
 
+    public static final int VERSION_1 = 1;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -42,7 +43,7 @@ public class StockControllerIntegrationTest {
             throws Exception {
         mvc.perform(get("/stock")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("version", 2))
+                        .header("version", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("state", is("EMPTY")));
@@ -54,13 +55,13 @@ public class StockControllerIntegrationTest {
         StockDetail stockDetail = mockHikingShoesWithQuantity(20);
         mvc.perform(patch("/stock")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("version", 2)
+                .header("version", 1)
                 .content(objectMapper.writeValueAsString(stockDetail))
         ).andExpect(status().isOk());
 
         mvc.perform(get("/stock")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("version", 2))
+                        .header("version", VERSION_1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("state", is("SOME")));
@@ -72,23 +73,43 @@ public class StockControllerIntegrationTest {
         StockDetail stockDetail = mockHikingShoesWithQuantity(20);
         mvc.perform(patch("/stock")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("version", 2)
+                .header("version", 1)
                 .content(objectMapper.writeValueAsString(stockDetail))
         ).andExpect(status().isOk());
 
         StockDetail otherStockDetail = mockOtherShoesWithQuantity(10);
         mvc.perform(patch("/stock")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("version", 2)
+                .header("version", 1)
                 .content(objectMapper.writeValueAsString(otherStockDetail))
         ).andExpect(status().isOk());
 
         mvc.perform(get("/stock")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("version", 2))
+                        .header("version", VERSION_1))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("state", is("FULL")));
+    }
+
+
+    @Test
+    public void stockIsFull_whenPatchStock_then400()
+            throws Exception {
+        StockDetail stockDetail = mockHikingShoesWithQuantity(20);
+        mvc.perform(patch("/stock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", VERSION_1)
+                .content(objectMapper.writeValueAsString(stockDetail))
+        ).andExpect(status().isOk());
+
+        StockDetail otherStockDetail = mockOtherShoesWithQuantity(11);
+        mvc.perform(patch("/stock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("version", VERSION_1)
+                .content(objectMapper.writeValueAsString(otherStockDetail))
+        ).andExpect(status().is4xxClientError());
+
     }
 
     private StockDetail mockHikingShoesWithQuantity(int quantity) {
